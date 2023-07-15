@@ -9,6 +9,8 @@ from torchvision.models import resnet50
 from data.CIFAR10_data_module import CombinedCifarDataModule, CifarCorruptedDataModule, \
     CifarCorruptedDataset, CifarValDataModule
 from torchvision import transforms, datasets
+import argparse
+import os
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -78,12 +80,17 @@ def test_by_folder(model):
     save_tensor_to_file(target_img, "./results/cifar_resnet50/test/target_img.png")
 
 
-
 if __name__ == "__main__":
     # Folder-based loader
     # style_img_list, content_image_list = get_images_from_folders(style_folder='./style_images/',
     #                                                             content_folder='./content_images/')
     # target_img = train(content_image_list[0], style_img_list[0], model)
+
+    # read corruption type from command line using argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--corruption", type=str, default="gaussian_noise", help="corruption type")
+    args = parser.parse_args()
+
 
     # Model-related
     #repo = 'pytorch/vision'
@@ -124,7 +131,7 @@ if __name__ == "__main__":
 
     # Content image comes from a corrupted dataset
     corrupted = CifarCorruptedDataset(base_c_path='/opt/data/CIFAR-10-C/',
-                                      corruption='defocus_blur', severity=5,
+                                      corruption=args.corruption, severity=5,
                                       transform=transform)
 
     for index in range(len(corrupted)):
@@ -138,17 +145,18 @@ if __name__ == "__main__":
         # For each corrupted image - optimize for 10 style images, one per class
         for label in range(10):
             style_img = clean_images[label].unsqueeze(0)
-            print(style_img.shape)
-            print(content_img.shape)
             # save the target image
             #save_tensor_to_file(style_img, "/opt/logs/results/cifar_resnet50/{}/style_img_st{}_c{}.png"
             #                    .format(content_label, index, label))
 
             target_img = train(content_img, style_img, model)
 
+            # create a folder for the current corruption type
+            if not os.path.exists("/opt/logs/results/cifar_resnet50/{}/{}".format(args.corruption, content_label)):
+                os.makedirs("/opt/logs/results/cifar_resnet50/{}/{}".format(args.corruption, content_label))
             # save the target image
-            save_tensor_to_file(target_img, "/opt/logs/results/cifar_resnet50/{}/target_img_st{}_c{}.png"
-                                .format(content_label, index, label))
+            save_tensor_to_file(target_img, "/opt/logs/results/cifar_resnet50/{}/{}/target_img_st{}_c{}.png"
+                                .format(args.corruption, content_label, index, label))
 
 
 

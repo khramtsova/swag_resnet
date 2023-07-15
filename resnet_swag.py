@@ -1,3 +1,5 @@
+import time
+
 from PIL import Image
 import numpy as np
 import argparse
@@ -217,14 +219,14 @@ def style_transfer(model, style, content, target, style_layer_weights, content_l
 
     style_grams = {layer: gram_matrix(style_features[layer]) for layer in style_features}
 
-
-
+    t1 = time.time()
+    print("Style layer weights", style_layer_weights)
     run = [0]
     while run[0] <= 1000:
+        print(run[0])
         def closure():
             optimizer.zero_grad()
             target_features = get_features(target, model)
-
             content_loss = torch.mean((target_features[content_layer_weights] -
                                        content_features[content_layer_weights]) ** 2)
             style_loss = 0
@@ -234,10 +236,8 @@ def style_transfer(model, style, content, target, style_layer_weights, content_l
                 # _, d, h, w = target_feature.shape
                 style_gram = style_grams[layer]
 
-                layer_style_loss = style_layer_weights[layer] * torch.mean(
-                    (target_gram - style_gram) ** 2)
+                layer_style_loss = torch.mean((target_gram - style_gram) ** 2)
                 style_loss += style_weight * layer_style_loss
-
             total_loss = content_weight * content_loss + style_loss
             total_loss.backward()
 
@@ -251,13 +251,15 @@ def style_transfer(model, style, content, target, style_layer_weights, content_l
         optimizer.step(closure)
 
     final_img = im_convert(target)
+    t2 = time.time()
+    print("Time taken: ", t2 - t1)
     return final_img
 
 
 # load model
 ARCHITECTURE = args.arch  # 'resnet50', 'resnet50_swag'
 
-resnet = models.resnet50(pretrained=True)
+resnet = models.resnet50(pretrained=False)
 
 
 
@@ -271,7 +273,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("DEVICE", device)
 resnet.to(device).eval()
 
+from data.folder_preprocess import get_images_from_folders
 # load style and content images combinations
+#style_img_list, content_image_list = get_images_from_folders()
+#target = content.clone().requires_grad_(True).to(device)
+
 
 style_image_list = []
 for file in glob.glob('./style_images/*'):

@@ -141,8 +141,8 @@ if __name__ == "__main__":
             print(style_img.shape)
             print(content_img.shape)
             # save the target image
-            save_tensor_to_file(style_img, "/opt/logs/results/cifar_resnet50/{}/style_img_st{}_c{}.png"
-                                .format(content_label, index, label))
+            #save_tensor_to_file(style_img, "/opt/logs/results/cifar_resnet50/{}/style_img_st{}_c{}.png"
+            #                    .format(content_label, index, label))
 
             target_img = train(content_img, style_img, model)
 

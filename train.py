@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     # Model-related
     #repo = 'pytorch/vision'
-    model_weights = torch.load("./model/model_weights/resnet50-11ad3fa6.pth")
+    model_weights = torch.load("/opt/model/model_weights/resnet50-11ad3fa6.pth")
     # weights = torch.hub.load("./model/model_weights/", 'resnet50', weights='ResNet50_Weights.DEFAULT')
     model = resnet50().to(device).eval()
     model.load_state_dict(model_weights)
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         content_img = corrupted[index][0].unsqueeze(0)
         content_label = corrupted[index][1]
 
-        save_tensor_to_file(content_img, "./results/cifar_resnet50/{}/content_img_st{}_c{}.png"
+        save_tensor_to_file(content_img, "/opt/logs/results/cifar_resnet50/{}/content_img_st{}_c{}.png"
                             .format(content_label, index, content_label))
 
         # For each corrupted image - optimize for 10 style images, one per class

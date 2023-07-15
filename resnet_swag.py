@@ -268,6 +268,7 @@ for param in resnet.parameters():
 torch.cuda.is_available()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("DEVICE", device)
 resnet.to(device).eval()
 
 # load style and content images combinations

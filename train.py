@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
     # Content image comes from a corrupted dataset
     corrupted = CifarCorruptedDataset(base_c_path='/opt/data/CIFAR-10-C/',
-                                      corruption='gaussian_noise', severity=5,
+                                      corruption='defocus_blur', severity=5,
                                       transform=transform)
 
     for index in range(len(corrupted)):

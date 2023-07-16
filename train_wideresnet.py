@@ -101,7 +101,7 @@ def train(content_image, style_image, model, log_dict, style_weight):
     t2 = time.time()
 
     # save_tensor_to_file(style_img, "/opt/logs/results/DEL/cifar_resnet50/style_img_st{}.png".format(step))
-    print("time needed per sample", t2 - t1)
+    # print("time needed per sample", t2 - t1)
     return target
 
 

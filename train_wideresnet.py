@@ -115,9 +115,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--corruption", type=str, default="gaussian_noise", help="corruption type")
     parser.add_argument("--style_weight", type=int, default=1000, help="weight of the style loss")
+    parser.add_argument("--log_dir", type=str, default="/opt/logs/", help="log directory")
+    parser.add_argument("--data_dir", type=str, default="/opt/data/", help="data directory")
     args = parser.parse_args()
 
-    dir_to_save = "/opt/logs/results/cifar_wideresnet28/{}/{}/".format(args.style_weight,
+    dir_to_save = "{}/results/cifar_wideresnet28/{}/{}/".format(args.log_dir,
+                                                                       args.style_weight,
                                                                        args.corruption)
     if not os.path.exists(dir_to_save):
         os.makedirs(dir_to_save)
@@ -127,7 +130,7 @@ if __name__ == "__main__":
     model = WideResNet()
     model_weights = load_model(model_name="Standard",
                             dataset="cifar10",
-                            model_dir="/opt/data" + "/CV_models/",
+                            model_dir=args.data_dir + "/CV_models/",
                             threat_model="corruptions").state_dict()
     model.load_state_dict(model_weights)
     model = model.to(device).eval()
@@ -149,7 +152,7 @@ if __name__ == "__main__":
 
     index = 1
     # Content image comes from a corrupted dataset
-    clean_dataset = datasets.CIFAR10("/opt/data/CIFAR10/",
+    clean_dataset = datasets.CIFAR10("{}/CIFAR10/".format(args.data_dir),
                                      train=False, download=False, transform=transform)
 
     # Mine for style images per class
@@ -168,7 +171,7 @@ if __name__ == "__main__":
     # style_img = clean_dataset[index][0].unsqueeze(0)
 
     # Style image comes from a clean dataset
-    corrupted = CifarCorruptedDataset(base_c_path='/opt/data/CIFAR-10-C/',
+    corrupted = CifarCorruptedDataset(base_c_path='{}/CIFAR-10-C/'.format(args.data_dir),
                                       corruption=args.corruption, severity=5,
                                       transform=transform)
 

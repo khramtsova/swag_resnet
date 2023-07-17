@@ -45,32 +45,13 @@ def train(content_image, style_image, model, log_dict, style_weight):
                         'conv3_3']  #,  'conv2_3', 'conv3_5', 'conv4_2']
     content_weight = 1  #
     # optimize directly the image "target"
-    num_steps = 6
+    num_steps = 1
 
     content_features = model.get_early_features_wideresnet(content_image)
     style_features = model.get_early_features_wideresnet(style_image)
     style_grams = {layer: gram_matrix(style_features[layer]) for layer in style_features}
     t1 = time.time()
-    for step in range(0, num_steps):
-        if step in [1, 5]:
-            # print("Step: ", step)
-            # print("Time: ", time.time() - t1)
-            # t1 = time.time()
-            pred = get_prediction(model, target)
-
-            log_dict["prediction"] = pred.item()
-            log_dict["step"] = step
-            # print("Log dict: ", log_dict)
-            csv_logger.add_record_to_log_file(log_dict)
-            # create a folder for the current corruption type
-
-            dir_to_save = "{}/{}/".format(csv_logger.dir_to_save, log_dict["content_label"])
-            if not os.path.exists(dir_to_save):
-                os.makedirs(dir_to_save)
-            # save the target image
-            save_tensor_to_file(target, "{}/target_st{}_c{}_step{}.png"
-                                .format(dir_to_save, log_dict["content_index"], log_dict["style_label"], step))
-
+    for step in range(1, num_steps+1):
 
         def closure():
             optimizer.zero_grad()
@@ -98,6 +79,26 @@ def train(content_image, style_image, model, log_dict, style_weight):
         #if step % 10 == 0:
         #    print("Step [{}/{}]".format(step, num_steps))
         # save_tensor_to_file(target, "/opt/logs/results/DEL/cifar_resnet50/target_img_st{}.png".format(step))
+
+        if step in [1, 5]:
+            # print("Step: ", step)
+            # print("Time: ", time.time() - t1)
+            # t1 = time.time()
+            pred = get_prediction(model, target)
+
+            log_dict["prediction"] = pred.item()
+            log_dict["step"] = step
+            # print("Log dict: ", log_dict)
+            csv_logger.add_record_to_log_file(log_dict)
+            # create a folder for the current corruption type
+
+            dir_to_save = "{}/{}/".format(csv_logger.dir_to_save, log_dict["content_label"])
+            if not os.path.exists(dir_to_save):
+                os.makedirs(dir_to_save)
+            # save the target image
+            save_tensor_to_file(target, "{}/target_st{}_c{}_step{}.png"
+                                .format(dir_to_save, log_dict["content_index"], log_dict["style_label"], step))
+
     t2 = time.time()
 
     # save_tensor_to_file(style_img, "/opt/logs/results/DEL/cifar_resnet50/style_img_st{}.png".format(step))
@@ -175,7 +176,7 @@ if __name__ == "__main__":
                                       corruption=args.corruption, severity=5,
                                       transform=transform)
 
-    for index in range(1000):  # (len(corrupted)):
+    for index in range(len(corrupted)):
         # Introduce a batch dimension
         content_img = corrupted[index][0].unsqueeze(0)
         content_label = corrupted[index][1]

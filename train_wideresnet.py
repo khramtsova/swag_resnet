@@ -120,7 +120,7 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", type=str, default="/opt/data/", help="data directory")
     args = parser.parse_args()
 
-    dir_to_save = "{}/results/cifar_wideresnet28/{}/{}/".format(args.log_dir,
+    dir_to_save = "{}/results/cifar_wideresnet28_v2/{}/{}/".format(args.log_dir,
                                                                        args.style_weight,
                                                                        args.corruption)
     if not os.path.exists(dir_to_save):

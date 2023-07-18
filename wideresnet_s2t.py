@@ -45,13 +45,14 @@ def train(content_image, style_image, model, log_dict, style_weight):
                         'conv3_3']  #,  'conv2_3', 'conv3_5', 'conv4_2']
     content_weight = 1  #
     # optimize directly the image "target"
-    num_steps = 1
+    num_steps = 5
 
     content_features = model.get_early_features_wideresnet(content_image)
     style_features = model.get_early_features_wideresnet(style_image)
     style_grams = {layer: gram_matrix(style_features[layer]) for layer in style_features}
     t1 = time.time()
     for step in range(1, num_steps+1):
+        # check every 100 steps
 
         def closure():
             optimizer.zero_grad()
